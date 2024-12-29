@@ -40,6 +40,9 @@ const Header = () => {
       px={4}
       shadow="md"
       width="100%" // Pastikan navbar mengikuti lebar container
+      position="fixed"
+      top={0}
+      zIndex={1000}
     >
       <Flex
         maxW="container.lg" // Tentukan lebar maksimal container agar tetap responsif
@@ -50,7 +53,7 @@ const Header = () => {
       >
         {/* Logo */}
         <Box color="green.500" fontSize="xl" fontWeight="bold">
-          <Link href="/">MyApp</Link>
+          <Link href="/">SocialApp</Link>
         </Box>
 
         {/* Navigation Links */}
@@ -60,6 +63,9 @@ const Header = () => {
           </Link>
           <Link href="/profile" _hover={{ textDecoration: "underline" }}>
             Profile
+          </Link>
+          <Link href="/notifications" _hover={{ textDecoration: "underline" }}>
+            Notifications
           </Link>
         </HStack>
 
@@ -90,6 +96,9 @@ const Header = () => {
             </Link>
             <Link href="/profile" _hover={{ textDecoration: "underline" }}>
               Profile
+            </Link>
+            <Link href="/notifications" _hover={{ textDecoration: "underline" }}>
+              Notifications
             </Link>
           </Stack>
         </Box>

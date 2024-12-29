@@ -2,7 +2,7 @@ import { Box, Button, Flex, Avatar, Text, IconButton, Modal, ModalOverlay, Modal
 import { FaThumbsUp, FaThumbsDown, FaComment, FaShare, FaEdit, FaTrash } from "react-icons/fa";
 import { useState } from "react";
 
-const PostCard = ({ post, toggleLike, onEditOpen, onDeleteOpen, setPostToDelete, onUserClick }) => {
+const PostCard = ({ post, toggleLike, onEditOpen, onDeleteOpen, setPostToDelete, onUserClick, onCommentsOpen }) => {
   const { isOpen, onOpen, onClose } = useDisclosure(); // Modal control
   const [newComment, setNewComment] = useState(""); // State for new comment input
   const [comments, setComments] = useState(post.comments || []); // Comments list for the post
@@ -98,7 +98,7 @@ const PostCard = ({ post, toggleLike, onEditOpen, onDeleteOpen, setPostToDelete,
           {post.is_like_post ? "Unlike" : "Like"}
         </Button>
         <Text ml={2}>{post.likes_count} Likes</Text>
-        <IconButton icon={<FaComment />} onClick={onOpen} colorScheme="green" aria-label="Comment" ml={4} />
+        <IconButton icon={<FaComment />} onClick={onCommentsOpen} colorScheme="green" aria-label="Comment" ml={4} />
         <Text ml={2}>{post.replies_count} Comments</Text>
         <IconButton icon={<FaShare />} onClick={() => alert("Share functionality is not implemented yet")} colorScheme="yellow" aria-label="Share" ml={4} />
         <IconButton icon={<FaEdit />} onClick={onEditOpen} colorScheme="blue" aria-label="Edit" ml={4} />
@@ -114,45 +114,6 @@ const PostCard = ({ post, toggleLike, onEditOpen, onDeleteOpen, setPostToDelete,
           Delete
         </Button>
       </Flex>
-      {/* Modal for Comments */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Comments</ModalHeader>
-          <ModalBody>
-            {comments.length === 0 ? (
-              <Text>No comments yet. Be the first to comment!</Text>
-            ) : (
-              comments?.map((comment) => (
-                <Flex key={comment.id} mb={2} justify="space-between" align="center">
-                  <Text>
-                    {comment.user}: {comment.text}
-                  </Text>
-                  <IconButton icon={<FaTrash />} onClick={() => handleDeleteComment(comment.id)} colorScheme="red" aria-label="Delete Comment" />
-                </Flex>
-              ))
-            )}
-            <FormControl mt={4}>
-              <FormLabel htmlFor="comment">Add a comment</FormLabel>
-              <Textarea id="comment" value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Write your comment here..." />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              onClick={handleAddComment}
-              isLoading={isCommentLoading} // Show loading spinner while submitting the comment
-              isDisabled={!newComment.trim()} // Disable the button if no comment text
-            >
-              Add Comment
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Box>
   );
 };

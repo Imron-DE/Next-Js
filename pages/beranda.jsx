@@ -10,7 +10,7 @@ import DeletePostModal from "@/components/DeletePostModal";
 
 const Beranda = () => {
   const router = useRouter();
-  const { postsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } = usePost();
+  const { postsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } = usePost("all");
 
   // Logika untuk komentar
   const [activePostId, setActivePostId] = useState(null);

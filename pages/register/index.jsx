@@ -70,105 +70,76 @@ function Register() {
   };
 
   return (
-    <Flex minH="100vh" align="center" justify="center" bg={bgColor}>
-      <Container maxW="md">
-        <Box bg={formBgColor} p={8} borderRadius="lg" boxShadow="lg" border="1px" borderColor={borderColor}>
-          <Flex justify="center" mb={6}>
-            <Heading as="h1" size="lg" color={useColorModeValue("gray.900", "white")}>
-              REGISTER
+    <>
+      <Heading as="h1" fontSize="4xl" fontWeight="bold" mb={6} textAlign="center" color="green.500" mt={10}>
+        Connectify
+      </Heading>
+      <Box display="flex" justifyContent="center" mt={10}>
+        <Container maxW="md">
+          <Box p={8} borderRadius="lg" boxShadow="lg" border="1px" borderColor="gray.200">
+            <Flex justify="center" mb={6}>
+              <Heading as="h1" size="lg" color={useColorModeValue("gray.900", "white")}>
+                REGISTER
+              </Heading>
+            </Flex>
+            <Heading as="h2" size="md" mb={6} textAlign="center" color={useColorModeValue("gray.900", "white")}>
+              please create your details
             </Heading>
-          </Flex>
-          <Heading as="h2" size="md" mb={6} textAlign="center" color={useColorModeValue("gray.900", "white")}>
-            Buat akun baru Anda
-          </Heading>
-          <Stack spacing={4}>
-            <FormControl id="name" isRequired>
-              <FormLabel>Name*</FormLabel>
-              <Input
-                value={payload.name}
-                onChange={(event) => setPayload({ ...payload, name: event.target.value })}
-                placeholder="Name ..."
-                bg={useColorModeValue("gray.50", "gray.700")}
-                borderColor={borderColor}
-                focusBorderColor="blue.500"
-              />
-            </FormControl>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email*</FormLabel>
-              <Input
-                value={payload.email}
-                onChange={(event) => setPayload({ ...payload, email: event.target.value })}
-                type="email"
-                placeholder="Email ..."
-                bg={useColorModeValue("gray.50", "gray.700")}
-                borderColor={borderColor}
-                focusBorderColor="blue.500"
-              />
-            </FormControl>
-            <FormControl id="dob" isRequired>
-              <FormLabel>Dob</FormLabel>
-              <Input value={payload.dob} onChange={(event) => setPayload({ ...payload, dob: event.target.value })} type="date" bg={useColorModeValue("gray.50", "gray.700")} borderColor={borderColor} focusBorderColor="blue.500" />
-            </FormControl>
-            <FormControl id="phone">
-              <FormLabel>Phone</FormLabel>
-              <Input
-                value={payload.phone}
-                onChange={(event) => setPayload({ ...payload, phone: event.target.value })}
-                placeholder="Phone ..."
-                bg={useColorModeValue("gray.50", "gray.700")}
-                borderColor={borderColor}
-                focusBorderColor="blue.500"
-              />
-            </FormControl>
-            <FormControl id="hobby">
-              <FormLabel>Hobby</FormLabel>
-              <Input
-                value={payload.hobby}
-                onChange={(event) => setPayload({ ...payload, hobby: event.target.value })}
-                placeholder="Hobby ..."
-                bg={useColorModeValue("gray.50", "gray.700")}
-                borderColor={borderColor}
-                focusBorderColor="blue.500"
-              />
-            </FormControl>
-            <FormControl id="password" isRequired>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input
-                  value={payload.password}
-                  onChange={(event) => setPayload({ ...payload, password: event.target.value })}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  bg={useColorModeValue("gray.50", "gray.700")}
-                  borderColor={borderColor}
-                  focusBorderColor="blue.500"
-                />
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={handleTogglePasswordVisibility}>
-                    {showPassword ? "Sembunyikan" : "Tampilkan"}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </FormControl>
-            {error && (
-              <Text color="red.500" textAlign="center">
-                {error}
-              </Text>
-            )}
-            <Button onClick={handleSubmit} colorScheme="blue" w="full" size="md" isLoading={loading} loadingText="Sedang daftar">
-              Daftar
-            </Button>
-          </Stack>
-          <Divider my={4} />
-          <Text textAlign="center" color={useColorModeValue("gray.500", "gray.400")}>
-            Sudah punya akun?{" "}
-            <Link href="/login" color={linkColor} fontWeight="medium">
-              Masuk
-            </Link>
-          </Text>
-        </Box>
-      </Container>
-    </Flex>
+            <Stack spacing={4}>
+              <FormControl id="name" isRequired>
+                <FormLabel>Name*</FormLabel>
+                <Input placeholder="Name ..." bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="blue.500" />
+              </FormControl>
+
+              <FormControl id="email" isRequired>
+                <FormLabel>Email*</FormLabel>
+                <Input type="email" placeholder="Email ..." bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="blue.500" />
+              </FormControl>
+
+              <FormControl id="dob" isRequired>
+                <FormLabel>Date of Birth</FormLabel>
+                <Input type="date" bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="blue.500" />
+              </FormControl>
+
+              <FormControl id="phone">
+                <FormLabel>Phone</FormLabel>
+                <Input placeholder="Phone ..." bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="blue.500" />
+              </FormControl>
+
+              <FormControl id="hobby">
+                <FormLabel>Hobby</FormLabel>
+                <Input placeholder="Hobby ..." bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="blue.500" />
+              </FormControl>
+
+              <FormControl id="password" isRequired>
+                <FormLabel>Password</FormLabel>
+                <InputGroup>
+                  <Input type="password" placeholder="••••••••" bg={useColorModeValue("gray.50", "gray.700")} borderColor="gray.300" focusBorderColor="green.500" />
+                  <InputRightElement width="4.5rem">
+                    <Button h="1.75rem" size="sm">
+                      Tampilkan
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+
+              <Button colorScheme="green" w="full" size="md" mt={4}>
+                Register
+              </Button>
+            </Stack>
+
+            <Divider my={4} />
+
+            <Text textAlign="center" color={useColorModeValue("gray.500", "gray.400")}>
+              already have an account?{" "}
+              <Link href="/login" color="blue.500" fontWeight="medium">
+                Login
+              </Link>
+            </Text>
+          </Box>
+        </Container>
+      </Box>
+    </>
   );
 }
 

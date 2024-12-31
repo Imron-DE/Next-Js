@@ -24,7 +24,7 @@ const ProfileById = () => {
 
   return (
     <Layout>
-      <Box maxW="container.xl" margin="10px" padding="10px" mx="auto" textAlign="center">
+      <Box maxW="800px" mt={10} p={6} mx="auto" borderWidth={1} borderRadius="md" boxShadow="lg">
         {/* User Data Card */}
         {userDataById && (
           <Card mx="auto" mb="6" maxW="sm">

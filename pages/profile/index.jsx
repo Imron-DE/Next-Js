@@ -1,4 +1,4 @@
-import { Box, Text, Spinner, VStack, Card, CardBody, Heading, Stack, Divider, Avatar, Button } from "@chakra-ui/react";
+import { Box, Text, Spinner, VStack, Card, CardBody, Heading, Stack, Divider, Avatar, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@chakra-ui/react";
 import usePost from "@/hooks/usePost";
 import useReplies from "@/hooks/useReplies"; // Pastikan path ini benar
 import PostForm from "@/components/PostForm";
@@ -6,12 +6,22 @@ import PostCard from "@/components/PostCard";
 import EditPostModal from "@/components/EditPostModal";
 import DeletePostModal from "@/components/DeletePostModal";
 import Layout from "@/components/Layouts";
+import { useState } from "react";
 
 const Profile = () => {
   const { userData, myPostsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } =
-    usePost();
+    usePost("me");
 
-  const { replyText, setReplyText, createReply, deleteReply } = useReplies();
+  // Logika untuk komentar
+  const [activePostId, setActivePostId] = useState(null);
+  const [isRepliesModalOpen, setRepliesModalOpen] = useState(false);
+
+  const { repliesList, repliesCount, isLoading: isRepliesLoading, error: repliesError, setError, createReply, deleteReply, setReplyText, replyText, fetchReplies } = useReplies();
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "Tanggal Tidak Valid" : date.toLocaleString();
+  };
 
   const toggleLike = (post) => {
     if (post.is_like_post) {
@@ -21,10 +31,30 @@ const Profile = () => {
     }
   };
 
-  const handleAddComment = (postId) => {
-    if (replyText.trim()) {
-      createReply(postId);
-      setReplyText(""); // Clear the input after submitting
+  const openRepliesModal = (postId) => {
+    setActivePostId(postId); // Set active postId saat membuka modal
+    fetchReplies(postId);
+    setRepliesModalOpen(true);
+  };
+
+  // Fungsi menutup modal balasan
+  const closeRepliesModal = () => {
+    setRepliesModalOpen(false);
+    setActivePostId(null); // Reset activePostId ketika modal ditutup
+  };
+
+  // Menambahkan balasan
+  const handleAddReply = async () => {
+    if (!replyText.trim()) {
+      setError("Balasan tidak boleh kosong.");
+      return;
+    }
+
+    if (activePostId) {
+      await createReply(activePostId);
+      setReplyText(""); // Bersihkan setelah berhasil
+    } else {
+      setError("postId tidak ditemukan.");
     }
   };
 
@@ -33,7 +63,7 @@ const Profile = () => {
 
   return (
     <Layout>
-      <Box maxW="container.xl" margin="10px" padding="10px" mx="auto" textAlign="center">
+      <Box maxW="800px" mt={10} p={6} mx="auto" borderWidth={1} borderRadius="md" boxShadow="lg">
         {/* User Data Card */}
         {userData && (
           <Card mx="auto" mb="6" maxW="sm">
@@ -85,12 +115,8 @@ const Profile = () => {
                   setEditedPost(post.description);
                 }}
                 onDeleteOpen={() => setPostToDelete(post.id)}
+                onCommentsOpen={() => openRepliesModal(post.id)}
                 setPostToDelete={setPostToDelete}
-                handleAddComment={handleAddComment} // Handle adding comment directly
-                replyText={replyText} // Manage reply text
-                setReplyText={setReplyText} // Allow setting reply text
-                createReply={createReply} // Create reply function
-                deleteReply={deleteReply} // Delete reply function
               />
             );
           })
@@ -100,6 +126,53 @@ const Profile = () => {
         <EditPostModal isOpen={!!editingPostId} onClose={() => setEditingPostId(null)} editedPost={editedPost} setEditedPost={setEditedPost} updatePost={updatePost} editingPostId={editingPostId} />
 
         <DeletePostModal isOpen={!!postToDelete} onClose={() => setPostToDelete(null)} deletePost={deletePost} postToDelete={postToDelete} />
+
+        {/* Modal Komentar */}
+        <Modal isOpen={isRepliesModalOpen} onClose={closeRepliesModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Komentar</ModalHeader>
+            <ModalBody>
+              {isRepliesLoading ? (
+                <Spinner size="lg" />
+              ) : repliesError ? (
+                <Text color="red.500">{repliesError}</Text>
+              ) : (
+                <>
+                  {repliesList.length === 0 ? (
+                    <Text color="gray.500">Belum ada komentar.</Text>
+                  ) : (
+                    repliesList.map((reply) => (
+                      <Box key={reply.id} mb={4} p={3} border="1px solid #ddd" borderRadius="md" backgroundColor="gray.50">
+                        <Text key={`name-${reply.id}`} fontSize="sm" color="blue.500" fontWeight="bold">
+                          {reply.user?.name}
+                        </Text>
+                        <Text key={`date-${reply.id}`} fontSize="sm" color="gray.500">
+                          {formatDate(reply.created_at)}
+                        </Text>
+                        <Text key={`description-${reply.id}`} mt={1}>
+                          {reply.description}
+                        </Text>
+                        <Button size="sm" colorScheme="red" mt={2} onClick={() => deleteReply(reply.id)} aria-label="Hapus balasan">
+                          Hapus
+                        </Button>
+                      </Box>
+                    ))
+                  )}
+                </>
+              )}
+              <Input placeholder="Tambah komentar..." value={replyText} onChange={(e) => setReplyText(e.target.value)} mt={4} />
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={handleAddReply}>
+                Tambahkan
+              </Button>
+              <Button ml={2} onClick={closeRepliesModal}>
+                Tutup
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </Layout>
   );

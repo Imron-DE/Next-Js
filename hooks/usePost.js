@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router"; // Import useRouter
 
-const usePost = () => {
+const usePost = (type = "all") => {
   const [postsList, setPostsList] = useState([]);
   const [myPostsList, setMyPostsList] = useState([]); // State for user's posts
   const [newPost, setNewPost] = useState("");
@@ -24,7 +24,9 @@ const usePost = () => {
       const token = Cookies.get("user_token");
       if (token) {
         try {
-          const res = await fetch("https://service.pace-unv.cloud/api/posts?type=all", {
+          const url = type === "all" ? "https://service.pace-unv.cloud/api/posts?type=all" : "https://service.pace-unv.cloud/api/posts?type=me"; // Memilih URL berdasarkan parameter type
+
+          const res = await fetch(url, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -32,7 +34,11 @@ const usePost = () => {
 
           const postsData = await res.json();
           if (res.ok) {
-            setPostsList(postsData.data);
+            if (type === "all") {
+              setPostsList(postsData.data);
+            } else {
+              setMyPostsList(postsData.data); // Menyimpan postingan user jika type adalah 'me'
+            }
           } else {
             console.error("Error fetching posts:", postsData);
             setError("Failed to fetch posts");
@@ -46,42 +52,12 @@ const usePost = () => {
     };
 
     fetchPosts();
-  }, []);
-
-  // Fetch user's posts
-  useEffect(() => {
-    const fetchMyPosts = async () => {
-      setIsLoading(true);
-      const token = Cookies.get("user_token");
-      if (token) {
-        try {
-          const res = await fetch("https://service.pace-unv.cloud/api/posts?type=me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          const postsData = await res.json();
-          if (res.ok) {
-            setMyPostsList(postsData.data);
-          } else {
-            console.error("Error fetching user posts:", postsData);
-            setError("Failed to fetch your posts");
-          }
-        } catch (error) {
-          console.error("Error fetching user posts:", error);
-          setError("Error fetching your posts");
-        }
-      }
-      setIsLoading(false);
-    };
-
-    fetchMyPosts();
-  }, []);
+  }, [type]); // Menambahkan type ke dalam dependensi effect
 
   // Fetch user data (me)
   useEffect(() => {
     const fetchUserData = async () => {
+      setIsLoading(true);
       const token = Cookies.get("user_token");
       if (token) {
         try {
@@ -103,6 +79,7 @@ const usePost = () => {
           setError("Error fetching user data");
         }
       }
+      setIsLoading(false);
     };
 
     fetchUserData();
@@ -123,7 +100,9 @@ const usePost = () => {
 
       const postData = await res.json();
       if (res.ok) {
-        setPostsList([postData.data, ...postsList]);
+        // Memperbarui postsList dan myPostsList dengan post baru
+        setPostsList((prevPosts) => [postData.data, ...prevPosts]);
+        setMyPostsList((prevPosts) => [postData.data, ...prevPosts]);
         setNewPost(""); // Reset input
       } else {
         console.error("Error adding post:", postData);
@@ -148,9 +127,11 @@ const usePost = () => {
 
       const updatedPost = await res.json();
       if (res.ok) {
+        // Memperbarui postsList dan myPostsList dengan post yang telah diupdate
         setPostsList((prevPosts) => prevPosts.map((post) => (post.id === updatedPost.data.id ? { ...post, description: updatedPost.data.description } : post)));
+        setMyPostsList((prevPosts) => prevPosts.map((post) => (post.id === updatedPost.data.id ? { ...post, description: updatedPost.data.description } : post)));
         setEditingPostId(null);
-        setEditedPost("");
+        setEditedPost(""); // Reset edit state
       } else {
         console.error("Error updating post:", updatedPost);
       }
@@ -170,7 +151,11 @@ const usePost = () => {
       });
 
       if (res.ok) {
+        // Menghapus post dari postsList
         setPostsList((prevPosts) => prevPosts.filter((post) => post.id !== postToDelete));
+
+        // Menghapus post dari myPostsList
+        setMyPostsList((prevPosts) => prevPosts.filter((post) => post.id !== postToDelete));
       } else {
         console.error("Error deleting post");
       }
@@ -190,7 +175,19 @@ const usePost = () => {
       });
 
       if (res.ok) {
+        // Memperbarui postsList dan myPostsList
         setPostsList((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  is_like_post: true, // Menandakan post telah disukai
+                  likes_count: post.likes_count + 1, // Menambah jumlah like
+                }
+              : post
+          )
+        );
+        setMyPostsList((prevPosts) =>
           prevPosts.map((post) =>
             post.id === postId
               ? {
@@ -220,7 +217,19 @@ const usePost = () => {
       });
 
       if (res.ok) {
+        // Memperbarui postsList dan myPostsList
         setPostsList((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  is_like_post: false, // Menandakan post tidak disukai
+                  likes_count: post.likes_count - 1, // Mengurangi jumlah like
+                }
+              : post
+          )
+        );
+        setMyPostsList((prevPosts) =>
           prevPosts.map((post) =>
             post.id === postId
               ? {
@@ -306,6 +315,8 @@ const usePost = () => {
   return {
     postsList,
     myPostsList, // Return user's posts list
+    setPostsList,
+    setMyPostsList,
     newPost,
     setNewPost,
     addPost,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Box, Flex, HStack, IconButton, Button, Menu, MenuButton, MenuItem, MenuList, useDisclosure, useColorModeValue, Stack, Spinner } from "@chakra-ui/react";
+import { Box, Flex, HStack, IconButton, Button, Menu, MenuButton, MenuItem, MenuList, useDisclosure, useColorModeValue, Stack, Spinner, color } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { useQueries } from "@/hooks/useQueries";
 import { useMutation } from "@/hooks/useMutation";
@@ -53,12 +53,12 @@ const Header = () => {
       >
         {/* Logo */}
         <Box color="green.500" fontSize="xl" fontWeight="bold">
-          <Link href="/">SocialApp</Link>
+          <Link href="/">Connectify</Link>
         </Box>
 
         {/* Navigation Links */}
         <HStack spacing={8} alignItems="center" display={{ base: "none", md: "flex" }} color="green.500">
-          <Link href="/" _hover={{ textDecoration: "underline" }}>
+          <Link href="/" _hover={{ textDecoration: "underline" }} color={router.pathname === "/" ? "green.600" : "green.500"}>
             Home
           </Link>
           <Link href="/profile" _hover={{ textDecoration: "underline" }}>

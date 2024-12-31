@@ -16,7 +16,7 @@ const useNotifications = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("https://service.pace-unv.cloud/api/notifications", {
+      const response = await fetch("https://service.pace-unv.cloud/api/notifications/", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -27,6 +27,7 @@ const useNotifications = () => {
         const data = await response.json();
         setNotifications(data.data); // Pastikan data yang diterima adalah data.data
         console.log(data);
+        console.log;
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Failed to fetch notifications");

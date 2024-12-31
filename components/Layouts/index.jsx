@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer/index";
 import Header from "@/components/Header/index";
 import Head from "next/head";
+import { Container } from "@chakra-ui/react"; // Import Chakra UI Container
 
 export default function Layout({
   children,
@@ -16,7 +17,11 @@ export default function Layout({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      {children}
+      <Container maxW="container." centerContent mt={20} mb={5}>
+        {" "}
+        {/* Default max width for container */}
+        {children}
+      </Container>
       <Footer />
     </>
   );

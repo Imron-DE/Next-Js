@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router"; // Import useRouter
 
@@ -17,42 +17,44 @@ const usePost = (type = "all") => {
   const router = useRouter();
   const { id } = router.query; // Ambil id dari URL parameter
 
-  // Fetch all posts
-  useEffect(() => {
-    const fetchPosts = async () => {
+  // Fetch all posts Berdasarkan type (all, my)
+  const fetchPosts = useCallback(async ({ type, refetch = false }) => {
+    if (!refetch) {
       setIsLoading(true);
-      const token = Cookies.get("user_token");
-      if (token) {
-        try {
-          const url = type === "all" ? "https://service.pace-unv.cloud/api/posts?type=all" : "https://service.pace-unv.cloud/api/posts?type=me"; // Memilih URL berdasarkan parameter type
+    }
 
-          const res = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+    const token = Cookies.get("user_token");
+    if (token) {
+      try {
+        const url = `https://service.pace-unv.cloud/api/posts?type=${type || "all"}`;
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-          const postsData = await res.json();
-          if (res.ok) {
-            if (type === "all") {
-              setPostsList(postsData.data);
-            } else {
-              setMyPostsList(postsData.data); // Menyimpan postingan user jika type adalah 'me'
-            }
+        const postsData = await res.json();
+        if (res.ok) {
+          if (type === "all") {
+            setPostsList(postsData.data);
           } else {
-            console.error("Error fetching posts:", postsData);
-            setError("Failed to fetch posts");
+            setMyPostsList(postsData.data);
           }
-        } catch (error) {
-          console.error("Error fetching posts:", error);
-          setError("Error fetching posts");
+        } else {
+          console.error("Error fetching posts:", postsData);
+          setError("Failed to fetch posts");
         }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        setError("Error fetching posts");
       }
-      setIsLoading(false);
-    };
+    }
+    setIsLoading(false);
+  }, []);
 
-    fetchPosts();
-  }, [type]); // Menambahkan type ke dalam dependensi effect
+  useEffect(() => {
+    fetchPosts({ type });
+  }, [type, fetchPosts]);
 
   // Fetch user data (me)
   useEffect(() => {
@@ -175,29 +177,7 @@ const usePost = (type = "all") => {
       });
 
       if (res.ok) {
-        // Memperbarui postsList dan myPostsList
-        setPostsList((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  is_like_post: true, // Menandakan post telah disukai
-                  likes_count: post.likes_count + 1, // Menambah jumlah like
-                }
-              : post
-          )
-        );
-        setMyPostsList((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  is_like_post: true, // Menandakan post telah disukai
-                  likes_count: post.likes_count + 1, // Menambah jumlah like
-                }
-              : post
-          )
-        );
+        fetchPosts({ type: type, refetch: true });
       } else {
         console.error("Error liking post");
       }
@@ -217,29 +197,7 @@ const usePost = (type = "all") => {
       });
 
       if (res.ok) {
-        // Memperbarui postsList dan myPostsList
-        setPostsList((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  is_like_post: false, // Menandakan post tidak disukai
-                  likes_count: post.likes_count - 1, // Mengurangi jumlah like
-                }
-              : post
-          )
-        );
-        setMyPostsList((prevPosts) =>
-          prevPosts.map((post) =>
-            post.id === postId
-              ? {
-                  ...post,
-                  is_like_post: false, // Menandakan post tidak disukai
-                  likes_count: post.likes_count - 1, // Mengurangi jumlah like
-                }
-              : post
-          )
-        );
+        fetchPosts({ type: type, refetch: true });
       } else {
         console.error("Error unliking post");
       }
@@ -335,6 +293,7 @@ const usePost = (type = "all") => {
     userData,
     userDataById,
     userPostsList,
+    fetchPosts,
   };
 };
 

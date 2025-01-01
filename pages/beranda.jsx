@@ -10,9 +10,27 @@ import DeletePostModal from "@/components/DeletePostModal";
 
 const Beranda = () => {
   const router = useRouter();
-  const toast = useToast(); // Menggunakan useToast
-  const { postsList, setPostsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } =
-    usePost("all");
+  const toast = useToast();
+  const {
+    postsList,
+    setPostsList,
+    newPost,
+    setNewPost,
+    addPost,
+    editingPostId,
+    setEditingPostId,
+    editedPost,
+    setEditedPost,
+    updatePost,
+    isLoading,
+    error,
+    postToDelete,
+    setPostToDelete,
+    handleLikePost,
+    handleUnlikePost,
+    deletePost,
+    fetchPosts,
+  } = usePost("all");
 
   // Logika untuk komentar
   const [activePostId, setActivePostId] = useState(null);
@@ -27,7 +45,7 @@ const Beranda = () => {
   };
 
   // Fungsi untuk toggle like
-  const toggleLike = (post) => {
+  const toggleLike = (post, type = "all") => {
     if (post.is_like_post) {
       handleUnlikePost(post.id);
     } else {
@@ -67,6 +85,7 @@ const Beranda = () => {
         await createReply(activePostId, replyText);
         setReplyText(""); // Bersihkan setelah berhasil
         await fetchReplies(activePostId);
+        fetchPosts({ type: "all", refetch: true });
         toast({
           title: "Balasan berhasil ditambahkan.",
           status: "success",
@@ -84,6 +103,28 @@ const Beranda = () => {
       }
     } else {
       setError("postId tidak ditemukan.");
+    }
+  };
+
+  const handleDeleteReply = async (replyId) => {
+    try {
+      await deleteReply(replyId);
+      await fetchReplies(activePostId);
+      await fetchPosts({ type: "all", refetch: true });
+      toast({
+        title: "Balasan berhasil dihapus.",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Gagal menghapus balasan.",
+        description: error.message || "Coba lagi nanti.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     }
   };
 
@@ -152,7 +193,12 @@ const Beranda = () => {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Komentar</ModalHeader>
-          <ModalBody>
+          <ModalBody
+            style={{
+              maxHeight: "400px", // Atur tinggi maksimal agar bisa scroll
+              overflowY: "auto", // Agar konten bisa digulir jika lebih tinggi dari 400px
+            }}
+          >
             {isRepliesLoading ? (
               <Spinner size="lg" />
             ) : repliesError ? (
@@ -163,7 +209,7 @@ const Beranda = () => {
                   <Text color="gray.500">Belum ada komentar.</Text>
                 ) : (
                   repliesList.map((reply) => (
-                    <Box key={reply.id} mb={4} p={3} border="1px solid #ddd" borderRadius="md" backgroundColor="gray.50">
+                    <Box key={reply.id} mb={4} p={3} border="1px solid #ddd" borderRadius="md" backgroundColor="gray.50 ">
                       <Text key={`name-${reply.id}`} fontSize="sm" color="blue.500" fontWeight="bold">
                         {reply.user?.name}
                       </Text>
@@ -173,7 +219,7 @@ const Beranda = () => {
                       <Text key={`description-${reply.id}`} mt={1}>
                         {reply.description}
                       </Text>
-                      <Button size="sm" colorScheme="red" mt={2} onClick={() => deleteReply(reply.id)} aria-label="Hapus balasan">
+                      <Button size="sm" colorScheme="red" mt={2} onClick={() => handleDeleteReply(reply.id, "all")} aria-label="Hapus balasan">
                         Hapus
                       </Button>
                     </Box>
@@ -181,10 +227,21 @@ const Beranda = () => {
                 )}
               </>
             )}
-            <Input placeholder="Tambah komentar..." value={replyText} onChange={(e) => setReplyText(e.target.value)} mt={4} />
+            <Input
+              placeholder="Tambah komentar..."
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              mt={4}
+              size="lg"
+              focusBorderColor="blue.500"
+              borderColor="gray.300"
+              borderWidth="1px"
+              borderRadius="md"
+              position={"relative"}
+            />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={handleAddReply}>
+            <Button colorScheme="blue" onClick={() => handleAddReply("all")}>
               Tambahkan
             </Button>
             <Button ml={2} onClick={closeRepliesModal}>

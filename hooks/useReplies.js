@@ -102,11 +102,8 @@ const useReplies = () => {
       if (res.ok) {
         const newReply = await res.json();
         setRepliesList((prevReplies) => [...prevReplies, newReply.data]);
-
-        setError(null); // Reset error jika berhasil
-
-        // Setelah berhasil menambahkan balasan, ambil ulang data posts
-        fetchPosts();
+        setError(null);
+        fetchPosts({ type: type, refetch: true });
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Gagal membuat balasan.");
@@ -119,10 +116,12 @@ const useReplies = () => {
   };
 
   // Fungsi untuk menghapus balasan
-  const deleteReply = async (replyId) => {
+  const deleteReply = async (replyId, type) => {
     const token = Cookies.get("user_token");
+
     if (!token) {
       setError("Pengguna belum login.");
+      console.log("Pengguna belum login.");
       return;
     }
 
@@ -130,6 +129,8 @@ const useReplies = () => {
     setError(null);
 
     try {
+      console.log(`Mencoba menghapus balasan dengan ID: ${replyId}`);
+
       const res = await fetch(`https://service.pace-unv.cloud/api/replies/delete/${replyId}`, {
         method: "DELETE",
         headers: {
@@ -138,13 +139,20 @@ const useReplies = () => {
       });
 
       if (res.ok) {
+        console.log("Balasan berhasil dihapus.");
         setRepliesList((prevReplies) => prevReplies.filter((reply) => reply.id !== replyId));
         setError(null); // Reset error jika berhasil
+
+        // Perbarui posts berdasarkan tipe yang aktif
+        await fetchPosts({ type: type, refetch: true });
+        console.log("Posts updated:", fetchPosts({ type: type, refetch: true }));
       } else {
         const errorData = await res.json();
+        console.error("Gagal menghapus balasan:", errorData);
         setError(errorData.message || "Gagal menghapus balasan.");
       }
     } catch (err) {
+      console.error("Terjadi kesalahan saat menghapus balasan:", err);
       setError("Terjadi kesalahan saat menghapus balasan.");
     } finally {
       setIsLoading(false);

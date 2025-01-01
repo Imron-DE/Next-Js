@@ -1,4 +1,4 @@
-import { Box, Text, Spinner, VStack, Card, CardBody, Heading, Stack, Divider, Avatar, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@chakra-ui/react";
+import { Box, Text, Spinner, VStack, Card, CardBody, Heading, Stack, Divider, Avatar, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useToast } from "@chakra-ui/react";
 import usePost from "@/hooks/usePost";
 import useReplies from "@/hooks/useReplies"; // Pastikan path ini benar
 import PostForm from "@/components/PostForm";
@@ -9,8 +9,27 @@ import Layout from "@/components/Layouts";
 import { useState } from "react";
 
 const Profile = () => {
-  const { userData, myPostsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } =
-    usePost("me");
+  const toast = useToast();
+  const {
+    userData,
+    myPostsList,
+    newPost,
+    setNewPost,
+    addPost,
+    editingPostId,
+    setEditingPostId,
+    editedPost,
+    setEditedPost,
+    updatePost,
+    isLoading,
+    error,
+    postToDelete,
+    setPostToDelete,
+    handleLikePost,
+    handleUnlikePost,
+    deletePost,
+    fetchPosts,
+  } = usePost("me");
 
   // Logika untuk komentar
   const [activePostId, setActivePostId] = useState(null);
@@ -23,7 +42,7 @@ const Profile = () => {
     return isNaN(date.getTime()) ? "Tanggal Tidak Valid" : date.toLocaleString();
   };
 
-  const toggleLike = (post) => {
+  const toggleLike = (post, type = "me") => {
     if (post.is_like_post) {
       handleUnlikePost(post.id);
     } else {
@@ -53,8 +72,32 @@ const Profile = () => {
     if (activePostId) {
       await createReply(activePostId);
       setReplyText(""); // Bersihkan setelah berhasil
+      await fetchReplies(activePostId);
+      await fetchPosts({ type: "me", refetch: true });
     } else {
       setError("postId tidak ditemukan.");
+    }
+  };
+
+  const handleDeleteReply = async (replyId) => {
+    try {
+      await deleteReply(replyId);
+      await fetchReplies(activePostId);
+      await fetchPosts({ type: "me", refetch: true });
+      toast({
+        title: "Balasan berhasil dihapus.",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Gagal menghapus balasan.",
+        description: error.message || "Coba lagi nanti.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     }
   };
 
@@ -145,7 +188,12 @@ const Profile = () => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Komentar</ModalHeader>
-            <ModalBody>
+            <ModalBody
+              style={{
+                maxHeight: "400px", // Atur tinggi maksimal agar bisa scroll
+                overflowY: "auto", // Agar konten bisa digulir jika lebih tinggi dari 400px
+              }}
+            >
               {isRepliesLoading ? (
                 <Spinner size="lg" />
               ) : repliesError ? (
@@ -156,7 +204,7 @@ const Profile = () => {
                     <Text color="gray.500">Belum ada komentar.</Text>
                   ) : (
                     repliesList.map((reply) => (
-                      <Box key={reply.id} mb={4} p={3} border="1px solid #ddd" borderRadius="md" backgroundColor="gray.50">
+                      <Box key={reply.id} mb={4} p={3} border="1px solid #ddd" borderRadius="md" backgroundColor="gray.50" maxH="auto" maxW="auto" overflowY="auto">
                         <Text key={`name-${reply.id}`} fontSize="sm" color="blue.500" fontWeight="bold">
                           {reply.user?.name}
                         </Text>
@@ -166,7 +214,7 @@ const Profile = () => {
                         <Text key={`description-${reply.id}`} mt={1}>
                           {reply.description}
                         </Text>
-                        <Button size="sm" colorScheme="red" mt={2} onClick={() => deleteReply(reply.id)} aria-label="Hapus balasan">
+                        <Button size="sm" colorScheme="red" mt={2} onClick={() => handleDeleteReply(reply.id, "me")} aria-label="Hapus balasan">
                           Hapus
                         </Button>
                       </Box>
@@ -174,7 +222,18 @@ const Profile = () => {
                   )}
                 </>
               )}
-              <Input placeholder="Tambah komentar..." value={replyText} onChange={(e) => setReplyText(e.target.value)} mt={4} />
+              <Input
+                placeholder="Tambah komentar..."
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                mt={4}
+                size="lg"
+                focusBorderColor="blue.500"
+                borderColor="gray.300"
+                borderWidth="1px"
+                borderRadius="md"
+                position={"relative"}
+              />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" onClick={handleAddReply}>

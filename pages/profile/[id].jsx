@@ -6,7 +6,8 @@ import PostCard from "@/components/PostCard";
 
 const ProfileById = () => {
   const router = useRouter();
-  const { id } = router.query; // Get the user ID from the URL query
+  const { id } = router.query;
+  // Get the user ID from the URL query
 
   const { userDataById, userPostsList, isLoading, error, handleLikePost, handleUnlikePost } = usePost(id); // Pass the ID to the custom hook to fetch user-specific data
 

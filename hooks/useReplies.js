@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
+import usePost from "@/hooks/usePost";
 
 const useReplies = () => {
   const router = useRouter();
@@ -10,6 +11,7 @@ const useReplies = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const { fetchPosts } = usePost();
 
   // Menyimpan postId dalam state jika queryPostId sudah tersedia
   useEffect(() => {
@@ -100,7 +102,11 @@ const useReplies = () => {
       if (res.ok) {
         const newReply = await res.json();
         setRepliesList((prevReplies) => [...prevReplies, newReply.data]);
+
         setError(null); // Reset error jika berhasil
+
+        // Setelah berhasil menambahkan balasan, ambil ulang data posts
+        fetchPosts();
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Gagal membuat balasan.");

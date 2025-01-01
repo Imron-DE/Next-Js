@@ -1,36 +1,54 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useNotifications from "@/hooks/useNotification";
 import Layout from "@/components/Layouts";
-import { Box, Text, Card, CardHeader, CardBody, CardFooter, Divider, Grid } from "@chakra-ui/react";
+import { Box, Text, Card, CardHeader, CardBody, CardFooter, Divider, Grid, Spinner, useToast } from "@chakra-ui/react";
 
 const Notifications = () => {
   const { notifications, isLoading, error } = useNotifications();
+  const toast = useToast();
 
-  // Menampilkan loading state saat data sedang diambil
+  // Display loading spinner while data is being fetched
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Box p={4} display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <Spinner size="xl" />
+      </Box>
+    );
   }
 
-  // Menampilkan error jika ada
+  // Display error message if there's an error
   if (error) {
-    return <div>Error: {error}</div>;
+    toast({
+      title: "Error fetching notifications.",
+      description: `An error occurred: ${error}`,
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+    return (
+      <Box p={4} textAlign="center">
+        <Text fontSize="xl" color="red.500">
+          Error: {error}
+        </Text>
+      </Box>
+    );
   }
 
-  // Menampilkan daftar notifikasi
+  // Display notifications if available
   return (
     <Layout>
       <Box p={4}>
-        {/* Menyusun teks "Notifications" di tengah */}
+        {/* Center-align "Notifications" text */}
         <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">
           Notifications
         </Text>
 
-        {/* Menampilkan notifikasi jika tersedia */}
+        {/* Display "No notifications available" message if no notifications */}
         {notifications?.length === 0 ? (
           <Text textAlign="center">No notifications available</Text>
         ) : (
           <Grid
-            columns={{ base: 1, md: 2, lg: 3 }} // Menyusun card dalam grid dengan jumlah kolom dinamis
+            columns={{ base: 1, md: 2, lg: 3 }} // Dynamic column layout
             spacing={4}
             justifyItems="center"
             maxWidth="1000px"
@@ -47,8 +65,8 @@ const Notifications = () => {
                 p={4}
                 mb={4}
                 _hover={{ boxShadow: "lg" }}
-                height="auto" // Kartu menyesuaikan dengan kontennya
-                width="100%" // Pastikan kartu menyesuaikan dengan lebar kolom
+                height="auto" // Cards adjust height based on content
+                width="100%" // Ensure card fits within column width
               >
                 <CardHeader>
                   <Text fontSize="xl" fontWeight="semibold">

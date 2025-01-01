@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { Box, Text, Spinner, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@chakra-ui/react";
+import { Box, Text, Spinner, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useToast } from "@chakra-ui/react";
 import usePost from "@/hooks/usePost";
 import useReplies from "@/hooks/useReplies"; // Import hooks untuk komentar
 import PostForm from "@/components/PostForm";
@@ -10,13 +10,15 @@ import DeletePostModal from "@/components/DeletePostModal";
 
 const Beranda = () => {
   const router = useRouter();
-  const { postsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } = usePost("all");
+  const toast = useToast(); // Menggunakan useToast
+  const { postsList, setPostsList, newPost, setNewPost, addPost, editingPostId, setEditingPostId, editedPost, setEditedPost, updatePost, isLoading, error, postToDelete, setPostToDelete, handleLikePost, handleUnlikePost, deletePost } =
+    usePost("all");
 
   // Logika untuk komentar
   const [activePostId, setActivePostId] = useState(null);
   const [isRepliesModalOpen, setRepliesModalOpen] = useState(false);
 
-  const { repliesList, repliesCount, isLoading: isRepliesLoading, error: repliesError, setError, createReply, deleteReply, setReplyText, replyText, fetchReplies } = useReplies();
+  const { repliesList, repliesCount, isLoading: isRepliesLoading, error: repliesError, setError, createReply, deleteReply, setReplyText, replyText, fetchReplies } = useReplies("all");
 
   // Format tanggal dengan validasi
   const formatDate = (dateString) => {
@@ -46,6 +48,9 @@ const Beranda = () => {
     setActivePostId(null); // Reset activePostId ketika modal ditutup
   };
 
+  const loggedInUserId = localStorage.getItem("user_id");
+  const isOwnPost = (post) => post.user_id === loggedInUserId;
+
   // Menambahkan balasan
   const handleAddReply = async () => {
     if (!replyText.trim()) {
@@ -54,16 +59,34 @@ const Beranda = () => {
     }
 
     if (activePostId) {
-      await createReply(activePostId);
-      setReplyText(""); // Bersihkan setelah berhasil
+      try {
+        await createReply(activePostId, replyText);
+        setReplyText(""); // Bersihkan setelah berhasil
+        await fetchReplies(activePostId);
+        toast({
+          title: "Balasan berhasil ditambahkan.",
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+        });
+      } catch (error) {
+        toast({
+          title: "Gagal menambahkan balasan.",
+          description: error.message || "Coba lagi nanti.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
     } else {
       setError("postId tidak ditemukan.");
     }
   };
 
-  // Navigasi ke profil pengguna
+  // Fungsi untuk menavigasi ke halaman profil pengguna
   const navigateToProfile = (userId) => {
-    router.push(`/profile/${userId}`);
+    // Menavigasi ke halaman profil pengguna dengan username yang diklik
+    router.push(`/${userId}`);
   };
 
   if (isLoading) return <Spinner size="lg" />;
@@ -86,6 +109,7 @@ const Beranda = () => {
         postsList.map((post) => (
           <PostCard
             key={post.id}
+            isOwnPost={isOwnPost(post)}
             post={post}
             toggleLike={toggleLike}
             onEditOpen={() => {

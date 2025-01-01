@@ -1,6 +1,35 @@
-import { Button, Textarea, Box } from "@chakra-ui/react";
+import { Button, Textarea, Box, Spinner, useToast } from "@chakra-ui/react";
+import { useState } from "react";
 
 const PostForm = ({ newPost, setNewPost, addPost }) => {
+  const toast = useToast(); // Toast notification
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to handle the submitting process
+
+  const handleAddPost = async () => {
+    setIsSubmitting(true);
+    try {
+      await addPost(); // Call the addPost function to add the new post
+      toast({
+        title: "Post added.",
+        description: "Your post was successfully added.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      setNewPost(""); // Clear the post input after successful submission
+    } catch (error) {
+      toast({
+        title: "An error occurred.",
+        description: "There was an issue adding your post.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Box
       mb={6}
@@ -26,7 +55,7 @@ const PostForm = ({ newPost, setNewPost, addPost }) => {
 
       {/* Button untuk memposting */}
       <Button
-        onClick={addPost}
+        onClick={handleAddPost} // Use the handleAddPost function
         colorScheme="teal"
         isDisabled={!newPost.trim()} // Disable tombol jika input kosong atau hanya berisi spasi
         w="full" // Membuat tombol memiliki lebar penuh sesuai Box
@@ -35,7 +64,7 @@ const PostForm = ({ newPost, setNewPost, addPost }) => {
         _active={{ bg: "teal.700" }} // Mengubah warna latar belakang saat tombol ditekan
         _focus={{ boxShadow: "outline" }} // Menambahkan efek fokus pada tombol
       >
-        Post
+        {isSubmitting ? <Spinner size="sm" /> : "Post"} {/* Show spinner when submitting */}
       </Button>
     </Box>
   );

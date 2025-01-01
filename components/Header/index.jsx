@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Box, Flex, HStack, IconButton, Button, Menu, MenuButton, MenuItem, MenuList, useDisclosure, useColorModeValue, Stack, Spinner, color } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { Box, Flex, HStack, IconButton, Button, Menu, MenuButton, MenuItem, MenuList, useDisclosure, useColorModeValue, Stack, Spinner, Avatar } from "@chakra-ui/react";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useQueries } from "@/hooks/useQueries";
 import { useMutation } from "@/hooks/useMutation";
 import Cookies from "js-cookie";
@@ -35,74 +35,58 @@ const Header = () => {
   };
 
   return (
-    <Box
-      bg={useColorModeValue("white", "gray.800")}
-      px={4}
-      shadow="md"
-      width="100%" // Pastikan navbar mengikuti lebar container
-      position="fixed"
-      top={0}
-      zIndex={1000}
-    >
-      <Flex
-        maxW="container.lg" // Tentukan lebar maksimal container agar tetap responsif
-        mx="auto" // Tengah-kan elemen container
-        h={16}
-        alignItems="center"
-        justifyContent="space-between"
-      >
+    <Box bg={useColorModeValue("white", "gray.800")} px={4} shadow="md" width="100%" position="fixed" top={0} zIndex={1000}>
+      <Flex maxW="container.lg" mx="auto" h={16} alignItems="center" justifyContent="space-between">
         {/* Logo */}
         <Box color="green.500" fontSize="xl" fontWeight="bold">
           <Link href="/">Connectify</Link>
         </Box>
 
-        {/* Navigation Links */}
-        <HStack spacing={8} alignItems="center" display={{ base: "none", md: "flex" }} color="green.500">
-          <Link href="/" _hover={{ textDecoration: "underline" }} color={router.pathname === "/" ? "green.600" : "green.500"}>
-            Home
-          </Link>
-          <Link href="/profile" _hover={{ textDecoration: "underline" }}>
-            Profile
-          </Link>
-          <Link href="/notifications" _hover={{ textDecoration: "underline" }}>
-            Notifications
-          </Link>
-        </HStack>
-
         {/* User Dropdown */}
         <Flex alignItems="center">
           <Menu>
-            <MenuButton as={Button} rounded="full" variant="link" cursor="pointer" minW={0} colorScheme="blue">
+            <MenuButton
+              as={Button}
+              rounded="full"
+              variant="link"
+              cursor="pointer"
+              minW={0}
+              display="flex"
+              alignItems="center"
+              gap={3} // Jarak antara Avatar dan teks
+              colorScheme="green"
+              _hover={{ bg: "green.100" }}
+            >
+              {/* Avatar */}
+              <Avatar size="sm" name={data?.data?.name || "User"} src={data?.data?.avatarUrl || ""} mr={2} />
+
+              {/* Nama atau Loading Spinner */}
               {isLoading ? <Spinner size="sm" /> : data?.data?.name || "User"}
             </MenuButton>
-            <MenuList>
+
+            <MenuList placement="left-start">
+              <MenuItem>
+                <Link href="/" _hover={{ textDecoration: "underline" }} color={router.pathname === "/" ? "green.600" : "green.500"}>
+                  Home
+                </Link>
+              </MenuItem>
+              <MenuItem>
+                <Link href="/profile" _hover={{ textDecoration: "underline" }} color={router.pathname === "/profile" ? "green.600" : "green.500"}>
+                  Profile
+                </Link>
+              </MenuItem>
+              <MenuItem>
+                <Link href="/notifications" _hover={{ textDecoration: "underline" }} color={router.pathname === "/notifications" ? "green.600" : "green.500"}>
+                  Notifications
+                </Link>
+              </MenuItem>
               <MenuItem onClick={handleLogout} color="red.500">
                 Logout
               </MenuItem>
             </MenuList>
           </Menu>
         </Flex>
-
-        {/* Mobile Navigation Toggle */}
-        <IconButton size="md" icon={isOpen ? <CloseIcon /> : <HamburgerIcon />} aria-label="Open Menu" display={{ md: "none" }} onClick={isOpen ? onClose : onOpen} />
       </Flex>
-
-      {/* Mobile Navigation */}
-      {isOpen && (
-        <Box pb={4} display={{ md: "none" }}>
-          <Stack as="nav" spacing={4} color="white">
-            <Link href="/" _hover={{ textDecoration: "underline" }}>
-              Home
-            </Link>
-            <Link href="/profile" _hover={{ textDecoration: "underline" }}>
-              Profile
-            </Link>
-            <Link href="/notifications" _hover={{ textDecoration: "underline" }}>
-              Notifications
-            </Link>
-          </Stack>
-        </Box>
-      )}
     </Box>
   );
 };

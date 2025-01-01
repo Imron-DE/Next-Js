@@ -63,16 +63,29 @@ const Profile = () => {
 
   return (
     <Layout>
-      <Box maxW="800px" mt={10} p={6} mx="auto" borderWidth={1} borderRadius="md" boxShadow="lg">
+      <Box
+        w="80%"
+        mt={10}
+        p={6}
+        mx="auto"
+        borderWidth={1}
+        borderRadius="md"
+        boxShadow="lg"
+        marginTop={-4}
+        marginBottom={-4}
+        maxH="755px" // Tinggi maksimal elemen
+        maxW="auto"
+        overflowY="auto"
+      >
         {/* User Data Card */}
         {userData && (
-          <Card mx="auto" mb="6" maxW="sm">
+          <Card mx="auto" mb="6" maxW="lg">
             <CardBody>
-              <Heading size="md" mb="4">
+              <Heading size="md" mb="4" textAlign="center">
                 User Profile
               </Heading>
               <Stack direction="row" align="center" spacing="4" mb="4">
-                <Avatar name={userData.name || "No Name"} />
+                <Avatar name={userData.name || "No Name"} width={"100px"} height={"100px"} />
                 <Text fontSize="xl" fontWeight="bold">
                   {userData.name || "Anonymous"}
                 </Text>

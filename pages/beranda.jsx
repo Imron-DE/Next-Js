@@ -48,7 +48,11 @@ const Beranda = () => {
     setActivePostId(null); // Reset activePostId ketika modal ditutup
   };
 
-  const loggedInUserId = localStorage.getItem("user_id");
+  let loggedInUserId = null;
+  if (typeof window !== "undefined") {
+    loggedInUserId = localStorage.getItem("user_id");
+  }
+
   const isOwnPost = (post) => post.user_id === loggedInUserId;
 
   // Menambahkan balasan
@@ -93,7 +97,20 @@ const Beranda = () => {
   if (error) return <Text color="red.500">{error}</Text>;
 
   return (
-    <Box maxW="800px" mt={10} p={6} mx="auto" borderWidth={1} borderRadius="md" boxShadow="lg">
+    <Box
+      w="80%"
+      mt={10}
+      p={6}
+      mx="auto"
+      borderWidth={1}
+      borderRadius="md"
+      boxShadow="lg"
+      marginTop={-4}
+      marginBottom={-4}
+      maxH="755px" // Tinggi maksimal elemen
+      maxW="auto"
+      overflowY="auto"
+    >
       {/* Form untuk menambah post */}
       <PostForm newPost={newPost} setNewPost={setNewPost} addPost={addPost} />
 

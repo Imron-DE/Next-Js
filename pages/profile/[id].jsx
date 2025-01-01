@@ -25,17 +25,30 @@ const ProfileById = () => {
 
   return (
     <Layout>
-      <Box maxW="800px" mt={10} p={6} mx="auto" borderWidth={1} borderRadius="md" boxShadow="lg">
+      <Box
+        w="80%"
+        mt={10}
+        p={6}
+        mx="auto"
+        borderWidth={1}
+        borderRadius="md"
+        boxShadow="lg"
+        marginTop={-4}
+        marginBottom={-4}
+        maxH="755px" // Tinggi maksimal elemen
+        maxW="auto"
+        overflowY="auto"
+      >
         {/* User Data Card */}
         {userDataById && (
-          <Card mx="auto" mb="6" maxW="sm">
+          <Card mx="auto" mb="6" maxW="lg" width={"100%"}>
             <CardBody>
-              <Heading size="md" mb="4">
+              <Heading size="md" mb="4" textAlign="center">
                 User Profile
               </Heading>
               <Stack direction="row" align="center" spacing="4" mb="4">
                 {/* Avatar and Name */}
-                <Avatar name={userDataById.name || "No Name"} />
+                <Avatar name={userDataById.name || "No Name"} width={"100px"} height={"100px"} src={userDataById.avatar} />
 
                 <Text fontSize="xl" fontWeight="bold">
                   {userDataById.name || "Anonymous"}

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Box, Flex, HStack, IconButton, Button, Menu, MenuButton, MenuItem, MenuList, useDisclosure, useColorModeValue, Stack, Spinner, Avatar } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useQueries } from "@/hooks/useQueries";
 import { useMutation } from "@/hooks/useMutation";
 import Cookies from "js-cookie";

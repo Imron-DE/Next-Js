@@ -1,5 +1,5 @@
-import { Box, Button, Flex, Avatar, Text, IconButton, useDisclosure, Spinner, useToast, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { FaThumbsUp, FaThumbsDown, FaComment, FaShare, FaEdit, FaTrash, FaEllipsisV } from "react-icons/fa";
+import { Box, Button, Flex, Avatar, Text, IconButton, useDisclosure, Spinner, useToast, Menu, MenuButton, MenuItem, MenuList, position } from "@chakra-ui/react";
+import { FaThumbsUp, FaThumbsDown, FaComment, FaShare, FaEllipsisV } from "react-icons/fa";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -60,15 +60,14 @@ const PostCard = ({ post, toggleLike, onEditOpen, onDeleteOpen, setPostToDelete,
 
   return (
     <Box
-      mb={4} // Margin bottom
-      p={6} // Increased padding (1.5rem = 24px)
-      borderRadius="lg" // Larger rounded corners
-      boxShadow="xl" // Larger shadow
-      bg="white.100" // Gray background
-      width="100%" // Full width of the container
-      maxW="700px" // Maximum width (adjust as needed)
-      mx="auto"
-      shadow={"lg"}
+      mb={6}
+      maxW="900px" // Lebar maksimal untuk Box
+      w="100%" // Membuat Box responsif
+      p={6} // Padding untuk memberi ruang di dalam Box
+      mx="auto" // Memusatkan Box secara horizontal
+      borderWidth={1} // Menambahkan border tipis
+      borderRadius="md" // Sudut membulat untuk efek modern
+      boxShadow="lg" // Bayangan untuk efek kedalaman
     >
       <Flex align="center" mb={4}>
         <Avatar name={post.user.name} src={`https://api.adorable.io/avatars/150/${post.user.email}.png`} />

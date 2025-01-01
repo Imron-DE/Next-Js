@@ -33,7 +33,7 @@ const PostForm = ({ newPost, setNewPost, addPost }) => {
   return (
     <Box
       mb={6}
-      maxW="600px" // Lebar maksimal untuk Box
+      maxW="900px" // Lebar maksimal untuk Box
       w="100%" // Membuat Box responsif
       p={6} // Padding untuk memberi ruang di dalam Box
       mx="auto" // Memusatkan Box secara horizontal

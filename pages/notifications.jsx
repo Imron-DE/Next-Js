@@ -37,7 +37,20 @@ const Notifications = () => {
   // Display notifications if available
   return (
     <Layout>
-      <Box p={4}>
+      <Box
+        w="80%"
+        mt={10}
+        p={6}
+        mx="auto"
+        borderWidth={1}
+        borderRadius="md"
+        boxShadow="lg"
+        marginTop={-4}
+        marginBottom={-4}
+        maxH="755px" // Tinggi maksimal elemen
+        maxW="auto"
+        overflowY="auto"
+      >
         {/* Center-align "Notifications" text */}
         <Text fontSize="2xl" fontWeight="bold" mb={4} textAlign="center">
           Notifications
